@@ -1,6 +1,6 @@
-export type CellValue = 2 | 4 | 8 | 16 | 32 | 64 | 128 | 256 | 512 | 1024 | 2048 | null;
-
+export type CellValue = number | null;
 export type BoardType = CellValue[][];
+ 
 
 export type Direction = 'up' | 'down' | 'left' | 'right';
 

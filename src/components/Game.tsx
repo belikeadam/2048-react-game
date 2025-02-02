@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Board from "./Board"
 import { useGame } from "../hooks/useGame"
+import type { BoardType } from "@/types/game"
 import type React from "react"
 
 export default function Game() {
@@ -111,4 +112,3 @@ export default function Game() {
     </div>
   )
 }
-

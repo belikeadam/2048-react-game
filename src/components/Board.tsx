@@ -1,8 +1,9 @@
-import Tile from "./Tile"
-import type { BoardType } from "@/types/game"
+import Tile from "./Tile";
+import type { BoardType, CellValue } from "@/types/game";
+
 interface BoardProps {
-  board: BoardType
-  mergedTiles: { [key: string]: boolean }
+  board: BoardType;
+  mergedTiles: { [key: string]: boolean };
 }
 
 export default function Board({ board, mergedTiles }: BoardProps) {
@@ -15,13 +16,12 @@ export default function Board({ board, mergedTiles }: BoardProps) {
         ))}
       </div>
       {/* Tiles */}
-      {board.flat().map((value, index) => {
-        const x = index % 4
-        const y = Math.floor(index / 4)
-        const key = `${x}-${y}`
-        return <Tile key={key} value={value ?? 0} position={{ x, y }} merged={mergedTiles[key] || false} />
+      {board.flat().map((value: CellValue, index) => {
+        const x = index % 4;
+        const y = Math.floor(index / 4);
+        const key = `${x}-${y}`;
+        return <Tile key={key} value={value ?? 0} position={{ x, y }} merged={mergedTiles[key] || false} />;
       })}
     </div>
-  )
+  );
 }
-
