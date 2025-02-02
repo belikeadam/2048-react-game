@@ -27,15 +27,26 @@ export default function Game() {
 
   useEffect(() => {
     const gameContainer = document.getElementById('game-container')
+    const preventPullToRefresh = (e: TouchEvent) => {
+      e.preventDefault()
+    }
+
     if (gameContainer) {
-      gameContainer.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false })
-      gameContainer.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false })
+      // Add all touch event listeners with passive: false
+      gameContainer.addEventListener('touchstart', preventPullToRefresh, { passive: false })
+      gameContainer.addEventListener('touchmove', preventPullToRefresh, { passive: false })
+      gameContainer.addEventListener('touchend', preventPullToRefresh, { passive: false })
+      
+      // Prevent body scrolling when touching game container
+      document.body.style.overflow = 'hidden'
     }
     
     return () => {
       if (gameContainer) {
-        gameContainer.removeEventListener('touchstart', (e) => e.preventDefault())
-        gameContainer.removeEventListener('touchmove', (e) => e.preventDefault())
+        gameContainer.removeEventListener('touchstart', preventPullToRefresh)
+        gameContainer.removeEventListener('touchmove', preventPullToRefresh)
+        gameContainer.removeEventListener('touchend', preventPullToRefresh)
+        document.body.style.overflow = 'auto'
       }
     }
   }, [])
@@ -46,6 +57,10 @@ export default function Game() {
       x: e.touches[0].clientX,
       y: e.touches[0].clientY,
     }
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    e.preventDefault()
   }
 
   const handleTouchEnd = (e: React.TouchEvent) => {
@@ -75,8 +90,9 @@ export default function Game() {
   return (
     <div
       id="game-container"
-      className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200 p-4"
+      className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200 p-4 touch-none"
       onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
       <h1 className="text-5xl font-bold mb-8 text-indigo-800 tracking-wide">2048</h1>
