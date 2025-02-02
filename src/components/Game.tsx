@@ -122,30 +122,26 @@ export default function Game() {
   return (
     <div
       id="game-container"
-      className={`flex flex-col items-center justify-center min-h-screen transition-colors duration-300 
-        ${isDarkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 to-indigo-100'}`}
+      className={`game-container flex flex-col items-center justify-center min-h-screen transition-colors duration-300 
+        ${isDarkMode ? 'dark' : ''}`}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
       <div className="flex items-center justify-between w-full max-w-md mb-8 px-4">
-        <h1 className={`text-4xl font-bold ${isDarkMode ? 'text-white' : 'text-indigo-900'} tracking-tight`}>
+        <h1 className="text-4xl font-bold text-foreground tracking-tight">
           2048
         </h1>
         <button
           onClick={() => setIsDarkMode(!isDarkMode)}
-          className={`p-2 rounded-full ${
-            isDarkMode ? 'bg-gray-800 text-yellow-500' : 'bg-indigo-100 text-indigo-900'
-          }`}
+          className="p-2 rounded-full bg-secondary text-secondary-foreground"
           aria-label="Toggle dark mode"
         >
           {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
         </button>
       </div>
 
-      <div className={`rounded-xl shadow-lg p-6 mb-8 ${
-        isDarkMode ? 'bg-gray-800' : 'bg-white'
-      }`}>
+      <div className="rounded-xl shadow-lg p-6 mb-8 bg-card text-card-foreground">
         <div className="grid grid-cols-2 gap-4 w-full max-w-md mb-6">
           <ScoreBox label="SCORE" value={score} isDark={isDarkMode} />
           <ScoreBox label="BEST" value={bestScore} isDark={isDarkMode} />
@@ -166,12 +162,12 @@ export default function Game() {
               animate={{ transform: 'scale(1) translateY(0)', opacity: 1 }}
               exit={{ transform: 'scale(0.8) translateY(20px)', opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className={`p-8 rounded-xl text-center shadow-2xl ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-indigo-800'}`}
+              className="p-8 rounded-xl text-center shadow-2xl bg-card text-card-foreground"
             >
               <h2 className="text-3xl font-bold mb-6">Game Over!</h2>
               <button
                 onClick={resetGame}
-                className="bg-indigo-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition-colors"
+                className="bg-primary text-primary-foreground px-6 py-3 rounded-lg text-lg font-semibold hover:bg-primary transition-colors"
               >
                 Play Again
               </button>
