@@ -1,31 +1,72 @@
 import { motion, AnimatePresence } from "framer-motion"
 
-const colors: { [key: number]: string } = {
-  2: "bg-blue-200 text-blue-800",
-  4: "bg-blue-300 text-blue-900",
-  8: "bg-blue-400 text-white",
-  16: "bg-blue-500 text-white",
-  32: "bg-blue-600 text-white",
-  64: "bg-blue-700 text-white",
-  128: "bg-indigo-500 text-white",
-  256: "bg-indigo-600 text-white",
-  512: "bg-indigo-700 text-white",
-  1024: "bg-indigo-800 text-white",
-  2048: "bg-indigo-900 text-white",
-}
-
 interface TileProps {
-  value: number
-  position: { x: number; y: number }
-  merged: boolean
+  value: number;
+  position: { x: number; y: number };
+  merged: boolean;
+  isDark?: boolean;
 }
 
-export default function Tile({ value, position, merged }: TileProps) {
+const getColorScheme = (value: number, isDark: boolean = false) => {
+  const colors: { [key: number]: { light: string; dark: string } } = {
+    2: {
+      light: "bg-emerald-100 text-emerald-900",
+      dark: "bg-emerald-900 text-emerald-100",
+    },
+    4: {
+      light: "bg-sky-200 text-sky-900",
+      dark: "bg-sky-800 text-sky-100",
+    },
+    8: {
+      light: "bg-indigo-300 text-indigo-900",
+      dark: "bg-indigo-700 text-indigo-100",
+    },
+    16: {
+      light: "bg-purple-400 text-white",
+      dark: "bg-purple-600 text-white",
+    },
+    32: {
+      light: "bg-pink-500 text-white",
+      dark: "bg-pink-700 text-white",  
+    },
+    64: {
+      light: "bg-rose-500 text-white",
+      dark: "bg-rose-700 text-white",
+    },
+    128: {
+      light: "bg-amber-400 text-white shadow-amber-200/50 shadow-[0_0_12px_3px]",
+      dark: "bg-amber-600 text-white shadow-amber-400/50 shadow-[0_0_12px_3px]",
+    },
+    256: {
+      light: "bg-amber-500 text-white shadow-amber-300/50 shadow-[0_0_12px_3px]",
+      dark: "bg-amber-700 text-white shadow-amber-500/50 shadow-[0_0_12px_3px]",
+    },
+    512: {
+      light: "bg-amber-600 text-white shadow-amber-400/50 shadow-[0_0_12px_3px]",
+      dark: "bg-amber-800 text-white shadow-amber-600/50 shadow-[0_0_12px_3px]",
+    },
+    1024: {
+      light: "bg-amber-700 text-white shadow-amber-500/50 shadow-[0_0_12px_3px]",
+      dark: "bg-amber-900 text-white shadow-amber-700/50 shadow-[0_0_12px_3px]",
+    },
+    2048: {
+      light: "bg-amber-800 text-white shadow-amber-600/50 shadow-[0_0_12px_3px]",
+      dark: "bg-amber-900 text-white shadow-amber-800/50 shadow-[0_0_12px_3px]",
+    },
+  };
+
+  return colors[value]?.[isDark ? 'dark' : 'light'] || 
+    (isDark ? 'bg-gray-600 text-gray-200' : 'bg-gray-200 text-gray-800');
+}
+export default function Tile({ value, position, merged, isDark }: TileProps) {
+  const colorScheme = getColorScheme(value, isDark);
+  const tileKey = `tile-${position.x}-${position.y}-${value}`;
+
   return (
     <AnimatePresence>
       {value !== 0 && (
         <motion.div
-          key={`${position.x}-${position.y}-${value}`}
+          key={tileKey}
           initial={{ scale: merged ? 0.8 : 0 }}
           animate={{
             scale: 1,
@@ -35,24 +76,28 @@ export default function Tile({ value, position, merged }: TileProps) {
           exit={{ scale: 0 }}
           transition={{
             type: "spring",
-            stiffness: 300,
-            damping: 20,
-            duration: 0.2,
+            stiffness: 1000,
+            damping: merged ? 20 : 30,
+            duration: 0.15,
+            mass: 0.5
           }}
-          className={`absolute w-[76px] h-[76px] flex items-center justify-center rounded-md ${
-            colors[value] || "bg-gray-200 text-gray-800"
-          } text-2xl font-bold shadow-md`}
+          className={`absolute w-[76px] h-[76px] flex items-center justify-center rounded-lg ${colorScheme} 
+            text-2xl font-bold shadow-lg backdrop-blur-sm`}
         >
           <motion.span
-            initial={{ scale: 1 }}
-            animate={{ scale: merged ? [1, 1.3, 1] : 1 }}
-            transition={{ duration: 0.2 }}
+            initial={{ scale: 0.8 }}
+            animate={{ scale: merged ? [0.8, 1.1, 1] : 1 }}
+            transition={{ 
+              duration: 0.15,
+              ease: "easeOut",
+              times: merged ? [0, 0.6, 1] : undefined
+            }}
+            className="font-mono tracking-tight"
           >
             {value}
           </motion.span>
         </motion.div>
       )}
     </AnimatePresence>
-  )
+  );
 }
-

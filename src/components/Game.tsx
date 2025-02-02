@@ -1,9 +1,11 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Board from "./Board"
+import ScoreBox from "./ScoreBox"
 import { useGame } from "../hooks/useGame"
+import { Moon, Sun } from "lucide-react"
 import type React from "react"
 
 const SWIPE_THRESHOLD = 50 // Minimum swipe distance
@@ -14,6 +16,22 @@ export default function Game() {
   const touchStartRef = useRef<{ x: number; y: number } | null>(null)
   const isProcessingTouch = useRef(false)
   const touchDebounceTime = 100 // ms
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('darkMode')
+      return saved ? JSON.parse(saved) : window.matchMedia('(prefers-color-scheme: dark)').matches
+    }
+    return false
+  })
+
+  useEffect(() => {
+    localStorage.setItem('darkMode', JSON.stringify(isDarkMode))
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [isDarkMode])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -104,39 +122,37 @@ export default function Game() {
   return (
     <div
       id="game-container"
-      className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200 p-4 touch-none will-change-transform will-change-opacity"
+      className={`flex flex-col items-center justify-center min-h-screen transition-colors duration-300 
+        ${isDarkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 to-indigo-100'}`}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      <h1 className="text-5xl font-bold mb-8 text-indigo-800 tracking-wide">2048</h1>
-      <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-        <div className="flex justify-between w-full max-w-md mb-6">
-          <div className="bg-indigo-100 rounded-lg p-3">
-            <p className="text-sm text-indigo-800 font-semibold">Score</p>
-            <motion.p
-              key={score}
-              initial={{ scale: 1.2, color: "#4CAF50" }}
-              animate={{ scale: 1, color: "#1F2937" }}
-              className="text-2xl font-bold text-indigo-900"
-            >
-              {score}
-            </motion.p>
-          </div>
-          <div className="bg-indigo-100 rounded-lg p-3">
-            <p className="text-sm text-indigo-800 font-semibold">Best</p>
-            <motion.p
-              key={bestScore}
-              initial={{ scale: 1.2, color: "#4CAF50" }}
-              animate={{ scale: 1, color: "#1F2937" }}
-              className="text-2xl font-bold text-indigo-900"
-            >
-              {bestScore}
-            </motion.p>
-          </div>
-        </div>
-        <Board board={board} mergedTiles={mergedTiles} />
+      <div className="flex items-center justify-between w-full max-w-md mb-8 px-4">
+        <h1 className={`text-4xl font-bold ${isDarkMode ? 'text-white' : 'text-indigo-900'} tracking-tight`}>
+          2048
+        </h1>
+        <button
+          onClick={() => setIsDarkMode(!isDarkMode)}
+          className={`p-2 rounded-full ${
+            isDarkMode ? 'bg-gray-800 text-yellow-500' : 'bg-indigo-100 text-indigo-900'
+          }`}
+          aria-label="Toggle dark mode"
+        >
+          {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+        </button>
       </div>
+
+      <div className={`rounded-xl shadow-lg p-6 mb-8 ${
+        isDarkMode ? 'bg-gray-800' : 'bg-white'
+      }`}>
+        <div className="grid grid-cols-2 gap-4 w-full max-w-md mb-6">
+          <ScoreBox label="SCORE" value={score} isDark={isDarkMode} />
+          <ScoreBox label="BEST" value={bestScore} isDark={isDarkMode} />
+        </div>
+        <Board board={board} mergedTiles={mergedTiles} isDark={isDarkMode} />
+      </div>
+      
       <AnimatePresence>
         {isGameOver && (
           <motion.div
@@ -150,9 +166,9 @@ export default function Game() {
               animate={{ transform: 'scale(1) translateY(0)', opacity: 1 }}
               exit={{ transform: 'scale(0.8) translateY(20px)', opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="bg-white p-8 rounded-xl text-center shadow-2xl"
+              className={`p-8 rounded-xl text-center shadow-2xl ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-indigo-800'}`}
             >
-              <h2 className="text-3xl font-bold mb-6 text-indigo-800">Game Over!</h2>
+              <h2 className="text-3xl font-bold mb-6">Game Over!</h2>
               <button
                 onClick={resetGame}
                 className="bg-indigo-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition-colors"

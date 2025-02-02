@@ -27,29 +27,29 @@ export function useGame(size = 4) {
     }
   }, [score, bestScore])
 
-  const move = useCallback((direction: Direction) => {
-    setBoard((currentBoard: BoardType) => {
-      const { newBoard, scoreIncrease, mergedPositions } = moveBoard(currentBoard, direction)
-      if (JSON.stringify(newBoard) !== JSON.stringify(currentBoard)) {
-        setScore((prevScore) => prevScore + scoreIncrease)
-        setMergedTiles(mergedPositions)
+// Update the timeouts in useGame.ts
+const move = useCallback((direction: Direction) => {
+  setBoard((currentBoard: BoardType) => {
+    const { newBoard, scoreIncrease, mergedPositions } = moveBoard(currentBoard, direction)
+    if (JSON.stringify(newBoard) !== JSON.stringify(currentBoard)) {
+      setScore((prevScore) => prevScore + scoreIncrease)
+      setMergedTiles(mergedPositions)
 
-        setTimeout(() => {
-          setBoard((prevBoard: BoardType) => {
-            const boardWithNewTile = prevBoard.map((row: number[]) => [...row])
-            addRandomTile(boardWithNewTile)
-            return boardWithNewTile
-          })
-        }, 150)
+      setTimeout(() => {
+        setBoard((prevBoard: BoardType) => {
+          const boardWithNewTile = prevBoard.map((row: number[]) => [...row])
+          addRandomTile(boardWithNewTile)
+          return boardWithNewTile
+        })
+      }, 100) // Reduced from 150
 
-        setTimeout(() => {
-          setMergedTiles({})
-        }, 250)
-      }
-      return newBoard
-    })
-  }, [])
-
+      setTimeout(() => {
+        setMergedTiles({})
+      }, 200) // Reduced from 250
+    }
+    return newBoard
+  })
+}, [])
   const resetGame = useCallback(() => {
     const newBoard = createEmptyBoard(size)
     addRandomTile(newBoard)
