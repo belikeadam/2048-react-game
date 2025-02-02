@@ -1,6 +1,5 @@
 import Tile from "./Tile"
-import type { BoardType } from "../types"
-
+import type { BoardType } from "@/types/game"
 interface BoardProps {
   board: BoardType
   mergedTiles: { [key: string]: boolean }
@@ -20,7 +19,7 @@ export default function Board({ board, mergedTiles }: BoardProps) {
         const x = index % 4
         const y = Math.floor(index / 4)
         const key = `${x}-${y}`
-        return <Tile key={key} value={value} position={{ x, y }} merged={mergedTiles[key] || false} />
+        return <Tile key={key} value={value ?? 0} position={{ x, y }} merged={mergedTiles[key] || false} />
       })}
     </div>
   )
