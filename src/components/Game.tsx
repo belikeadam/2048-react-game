@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useCallback } from "react"
+import { useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Board from "./Board"
 import { useGame } from "../hooks/useGame"
