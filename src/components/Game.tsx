@@ -123,7 +123,7 @@ export default function Game() {
     <div
       id="game-container"
       className={`game-container flex flex-col items-center justify-center min-h-screen transition-colors duration-300 
-        ${isDarkMode ? 'dark' : ''}`}
+        ${isDarkMode ? 'dark bg-background' : 'bg-gradient-to-br from-blue-50 to-indigo-100'}`}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
