@@ -4,7 +4,10 @@ import { useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Board from "./Board"
 import { useGame } from "../hooks/useGame"
- import type React from "react"
+import type React from "react"
+
+const SWIPE_THRESHOLD = 50 // Minimum swipe distance
+const SWIPE_ANGLE_THRESHOLD = 30 // Maximum angle deviation for swipe direction
 
 export default function Game() {
   const { board, score, bestScore, move, isGameOver, resetGame, mergedTiles } = useGame()
@@ -22,7 +25,23 @@ export default function Game() {
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [move])
 
+  useEffect(() => {
+    const gameContainer = document.getElementById('game-container')
+    if (gameContainer) {
+      gameContainer.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false })
+      gameContainer.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false })
+    }
+    
+    return () => {
+      if (gameContainer) {
+        gameContainer.removeEventListener('touchstart', (e) => e.preventDefault())
+        gameContainer.removeEventListener('touchmove', (e) => e.preventDefault())
+      }
+    }
+  }, [])
+
   const handleTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault()
     touchStartRef.current = {
       x: e.touches[0].clientX,
       y: e.touches[0].clientY,
@@ -30,6 +49,7 @@ export default function Game() {
   }
 
   const handleTouchEnd = (e: React.TouchEvent) => {
+    e.preventDefault()
     if (!touchStartRef.current) return
 
     const touchEnd = {
@@ -39,11 +59,14 @@ export default function Game() {
 
     const dx = touchEnd.x - touchStartRef.current.x
     const dy = touchEnd.y - touchStartRef.current.y
+    const angle = Math.abs((Math.atan2(dy, dx) * 180) / Math.PI)
 
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 20) {
-      move(dx > 0 ? "right" : "left")
-    } else if (Math.abs(dy) > 20) {
-      move(dy > 0 ? "down" : "up")
+    if (Math.abs(dx) > SWIPE_THRESHOLD || Math.abs(dy) > SWIPE_THRESHOLD) {
+      if (angle < SWIPE_ANGLE_THRESHOLD || angle > 180 - SWIPE_ANGLE_THRESHOLD) {
+        move(dx > 0 ? "right" : "left")
+      } else if (Math.abs(angle - 90) < SWIPE_ANGLE_THRESHOLD) {
+        move(dy > 0 ? "down" : "up")
+      }
     }
 
     touchStartRef.current = null
@@ -51,6 +74,7 @@ export default function Game() {
 
   return (
     <div
+      id="game-container"
       className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200 p-4"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
