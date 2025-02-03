@@ -61,6 +61,7 @@ const move = useCallback((direction: Direction) => {
 
   return {
     board,
+    setBoard,
     score,
     bestScore,
     move,
