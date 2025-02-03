@@ -136,7 +136,7 @@ const PowerUps: React.FC<PowerUpsProps> = ({
           onClick={() => handlePowerUp('undo')}
           disabled={!canUndo || cooldowns.undo > 0}
           className={`power-up-button ${!canUndo ? 'opacity-50' : ''}`}
-          title={`Undo (${undosLeft} left)`}
+          title={`Undo: Reverts the last move. (${undosLeft} left)`}
         >
           <RotateCcw className="w-5 h-5" />
           {cooldowns.undo > 0 && <span className="cooldown">{cooldowns.undo}s</span>}
@@ -146,7 +146,7 @@ const PowerUps: React.FC<PowerUpsProps> = ({
           onClick={() => handlePowerUp('shuffle')}
           disabled={shufflesLeft === 0 || cooldowns.shuffle > 0}
           className={`power-up-button ${shufflesLeft === 0 ? 'opacity-50' : ''}`}
-          title={`Shuffle (${shufflesLeft} left)`}
+          title={`Shuffle: Randomizes the board tiles. (${shufflesLeft} left)`}
         >
           <Shuffle className="w-5 h-5" />
           {cooldowns.shuffle > 0 && <span className="cooldown">{cooldowns.shuffle}s</span>}
@@ -156,7 +156,7 @@ const PowerUps: React.FC<PowerUpsProps> = ({
           onClick={() => handlePowerUp('swap')}
           disabled={swapsLeft === 0 || cooldowns.swap > 0}
           className={`power-up-button ${swapsLeft === 0 ? 'opacity-50' : ''}`}
-          title={`Swap (${swapsLeft} left)`}
+          title={`Swap: Allows you to swap two tiles. (${swapsLeft} left)`}
         >
           <ArrowLeftRight className="w-5 h-5" />
           {cooldowns.swap > 0 && <span className="cooldown">{cooldowns.swap}s</span>}
@@ -166,7 +166,7 @@ const PowerUps: React.FC<PowerUpsProps> = ({
           onClick={() => handlePowerUp('hint')}
           disabled={hintsLeft === 0 || cooldowns.hint > 0}
           className={`power-up-button ${hintsLeft === 0 ? 'opacity-50' : ''}`}
-          title={`Hint (${hintsLeft} left)`}
+          title={`Hint: Shows the best move. (${hintsLeft} left)`}
         >
           <Lightbulb className="w-5 h-5" />
           {cooldowns.hint > 0 && <span className="cooldown">{cooldowns.hint}s</span>}
