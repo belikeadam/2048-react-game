@@ -9,7 +9,7 @@ import Footer from "./Footer";
 import { useGame } from "../hooks/useGame";
 import { Moon, Sun } from "lucide-react";
 import type React from "react";
-import { Position, BoardType } from "./types";
+import { Position, BoardType } from "../../types";  
 
 const SWIPE_THRESHOLD = 50;
 const SWIPE_ANGLE_THRESHOLD = 30;

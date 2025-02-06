@@ -13,21 +13,28 @@ interface GridProps {
 const Grid: React.FC<GridProps> = ({ grid, onTileClick, swapMode, selectedTile, hintDirection }) => {
   return (
     <div className="grid-container">
-      {grid.map((row, rowIndex) => (
-        <div key={rowIndex} className="grid-row">
-          {row.map((value, colIndex) => (
-            <Tile
-              key={colIndex}
-              value={value}
-              position={{ row: rowIndex, col: colIndex }}
-              onClick={() => onTileClick(rowIndex, colIndex)}
-              swapMode={swapMode}
-              selected={selectedTile?.row === rowIndex && selectedTile?.col === colIndex}
-              hintDirection={hintDirection}
-            />
-          ))}
-        </div>
-      ))}
+      <div className="grid-bg">
+        {Array.from({ length: 16 }, (_, i) => (
+          <div key={`cell-${i}`} className="grid-cell" />
+        ))}
+      </div>
+      <div className="relative w-full h-full">
+        {grid.map((row, rowIndex) => (
+          <div key={`row-${rowIndex}`} className="grid-row">
+            {row.map((value, colIndex) => (
+              <Tile
+                key={`tile-${rowIndex}-${colIndex}-${value}`}
+                value={value}
+                position={{ row: rowIndex, col: colIndex }}
+                onClick={() => onTileClick(rowIndex, colIndex)}
+                swapMode={swapMode}
+                selected={selectedTile?.row === rowIndex && selectedTile?.col === colIndex}
+                hintDirection={hintDirection}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

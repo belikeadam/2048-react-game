@@ -73,6 +73,13 @@ body {
 
 /* Add hardware acceleration for smoother animations */
 .game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #faf8ef;
+  padding: 20px;
   -webkit-transform: translateZ(0);
   -moz-transform: translateZ(0);
   -ms-transform: translateZ(0);
@@ -87,16 +94,113 @@ body {
   -ms-perspective: 1000;
   perspective: 1000;
 }
+.score-container {
+  display: flex;
+  justify-content: space-between;
+  width: 320px;
+  margin-bottom: 20px;
+}
+
+.score-box {
+  background-color: #bbada0;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  width: 100px;
+}
+
+.power-ups-container {
+  display: flex;
+  justify-content: space-between;
+  width: 320px;
+  margin-top: 20px;
+}
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  width: 320px;
+  height: 320px;
+  background-color: #bbada0;
+  padding: 12px;
+  border-radius: 10px;
+  position: relative;
+}
+
+.grid-bg {
+  position: absolute;
+  inset: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  z-index: 0;
+}
+
+.grid-cell {
+  background-color: rgba(238, 228, 218, 0.35);
+  border-radius: 6px;
+  width: 65px;
+  height: 65px;
+}
+
 .tile {
-  @apply relative transition-all duration-200;
+  width: 65px;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: 6px;
+  position: absolute;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  z-index: 1;
 }
 
 .tile.swap-mode {
-  @apply cursor-pointer hover:brightness-110;
+  cursor: pointer;
+  hover: brightness(110%);
 }
 
 .tile.selected {
-  @apply ring-4 ring-blue-500;
+  ring: 4px solid blue;
+}
+
+.hint-up {
+  animation: bounce-up 1s infinite;
+}
+
+.hint-down {
+  animation: bounce-down 1s infinite;
+}
+
+.hint-left {
+  animation: bounce-left 1s infinite;
+}
+
+.hint-right {
+  animation: bounce-right 1s infinite;
+}
+
+@keyframes bounce-up {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes bounce-down {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(10px); }
+}
+
+@keyframes bounce-left {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-10px); }
+}
+
+@keyframes bounce-right {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(10px); }
 }
 
 @layer components {
@@ -104,23 +208,6 @@ body {
   .hint-down { @apply animate-bounce-down; }
   .hint-left { @apply animate-bounce-left; }
   .hint-right { @apply animate-bounce-right; }
-
-  @keyframes bounce-up { 
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-  @keyframes bounce-down { 
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(10px); }
-  }
-  @keyframes bounce-left { 
-    0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(-10px); }
-  }
-  @keyframes bounce-right { 
-    0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(10px); }
-  }
 
   .animate-bounce-up {
     animation: bounce-up 1s infinite;

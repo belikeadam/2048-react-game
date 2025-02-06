@@ -76,8 +76,8 @@ export default function Tile({ value, position, merged = false, isDark = false, 
           initial={{ scale: merged ? 0.8 : 0 }}
           animate={{
             scale: 1,
-            x: position.col * 78,
-            y: position.row * 78,
+            x: position.col * 77, // (65px tile + 12px gap)
+            y: position.row * 77, // (65px tile + 12px gap)
           }}
           exit={{ scale: 0 }}
           transition={{
@@ -87,7 +87,7 @@ export default function Tile({ value, position, merged = false, isDark = false, 
             duration: 0.15,
             mass: 0.5
           }}
-          className={`absolute w-[76px] h-[76px] flex items-center justify-center rounded-lg ${colorScheme} 
+          className={`absolute w-[65px] h-[65px] flex items-center justify-center rounded-lg ${colorScheme} 
             text-2xl font-bold shadow-lg backdrop-blur-sm ${swapMode ? 'swap-mode' : ''} ${selected ? 'selected' : ''}`}
           onClick={onClick}
         >
