@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import Tile from './Tile';
-import { Position, BoardType } from "../../types";  
+import { Position  } from "../../types";  
 
 interface GridProps {
   grid: number[][];
