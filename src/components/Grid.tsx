@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import Tile from './Tile';
 import { Position, BoardType } from "../../types";  
 
@@ -10,7 +10,7 @@ interface GridProps {
   hintDirection: string | null;
 }
 
-const Grid: React.FC<GridProps> = ({ grid, onTileClick, swapMode, selectedTile, hintDirection }) => {
+const Grid: React.FC<GridProps> = memo(({ grid, onTileClick, swapMode, selectedTile, hintDirection }) => {
   return (
     <div className="grid-container">
       <div className="grid-bg">
@@ -22,21 +22,25 @@ const Grid: React.FC<GridProps> = ({ grid, onTileClick, swapMode, selectedTile, 
         {grid.map((row, rowIndex) => (
           <div key={`row-${rowIndex}`} className="grid-row">
             {row.map((value, colIndex) => (
-              <Tile
-                key={`tile-${rowIndex}-${colIndex}-${value}`}
-                value={value}
-                position={{ row: rowIndex, col: colIndex }}
-                onClick={() => onTileClick(rowIndex, colIndex)}
-                swapMode={swapMode}
-                selected={selectedTile?.row === rowIndex && selectedTile?.col === colIndex}
-                hintDirection={hintDirection}
-              />
+              value !== 0 && (
+                <Tile
+                  key={`tile-${rowIndex}-${colIndex}-${value}`}
+                  value={value}
+                  position={{ row: rowIndex, col: colIndex }}
+                  onClick={() => onTileClick(rowIndex, colIndex)}
+                  swapMode={swapMode}
+                  selected={selectedTile?.row === rowIndex && selectedTile?.col === colIndex}
+                  hintDirection={hintDirection}
+                />
+              )
             ))}
           </div>
         ))}
       </div>
     </div>
   );
-};
+});
+
+Grid.displayName = 'Grid';
 
 export default Grid;

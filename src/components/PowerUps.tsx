@@ -1,7 +1,7 @@
 'use client'
-
 import React, { useState, useEffect } from 'react';
-import { RotateCcw, Shuffle, ArrowLeftRight, Lightbulb, Timer } from 'lucide-react';
+import { RotateCcw, Shuffle, ArrowLeftRight, Lightbulb } from 'lucide-react';
+import PowerUpTooltip from './PowerUpTooltip';
 
 interface PowerUpsProps {
   onUndo: () => void;
@@ -26,7 +26,6 @@ const PowerUps: React.FC<PowerUpsProps> = ({
   isTimedMode,
   moveHistory
 }) => {
-  // Initialize state after component mounts
   const [mounted, setMounted] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const [undosLeft, setUndosLeft] = useState(0);
@@ -40,42 +39,27 @@ const PowerUps: React.FC<PowerUpsProps> = ({
     hint: 0
   });
 
-  // Initialize state after component mounts
   useEffect(() => {
     setMounted(true);
     setTimeLeft(timer);
     setUndosLeft(1);
-    setShufflesLeft(2); 
+    setShufflesLeft(2);
     setSwapsLeft(1);
     setHintsLeft(3);
   }, [timer]);
 
-  // Reset power-ups when score reaches thresholds
   useEffect(() => {
     if (!mounted) return;
-    
+
     if (score >= 500 && undosLeft === 0) setUndosLeft(1);
     if (score >= 1000 && shufflesLeft === 0) setShufflesLeft(1);
     if (score >= 1500 && swapsLeft === 0) setSwapsLeft(1);
     if (score >= 2000 && hintsLeft === 0) setHintsLeft(1);
   }, [score, mounted, undosLeft, shufflesLeft, swapsLeft, hintsLeft]);
 
-  // Timer logic
   useEffect(() => {
     if (!mounted) return;
-    
-    if (isTimedMode && timeLeft > 0) {
-      const timerId = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
-      return () => clearInterval(timerId);
-    } else if (timeLeft === 0 && isTimedMode) {
-      onTimedMode();
-    }
-  }, [timeLeft, isTimedMode, onTimedMode, mounted]);
 
-  // Cooldown timer
-  useEffect(() => {
-    if (!mounted) return;
-    
     const cooldownTimer = setInterval(() => {
       setCooldowns(prev => ({
         undo: Math.max(0, prev.undo - 1),
@@ -123,10 +107,8 @@ const PowerUps: React.FC<PowerUpsProps> = ({
     }
   };
 
-  // Only render after component is mounted
   if (!mounted) return null;
 
-  // Update undo availability check
   const canUndo = moveHistory > 1 && undosLeft > 0;
 
   return (
@@ -135,39 +117,75 @@ const PowerUps: React.FC<PowerUpsProps> = ({
         <button
           onClick={() => handlePowerUp('undo')}
           disabled={!canUndo || cooldowns.undo > 0}
-          className={`power-up-button ${!canUndo ? 'opacity-50' : ''}`}
-          title={`Undo: Reverts the last move. (${undosLeft} left)`}
+          className={`power-up-button group ${!canUndo ? 'opacity-50' : ''}`}
+          aria-label="Undo last move"
         >
+          <div className="power-up-tooltip">
+            <PowerUpTooltip
+              title="Undo Move"
+              description="Revert to the previous board state. Great for fixing mistakes!"
+              uses={undosLeft}
+              cooldown={30}
+              unlockScore={500}
+            />
+          </div>
           <RotateCcw className="w-5 h-5" />
           {cooldowns.undo > 0 && <span className="cooldown">{cooldowns.undo}s</span>}
         </button>
-        
+
         <button
           onClick={() => handlePowerUp('shuffle')}
           disabled={shufflesLeft === 0 || cooldowns.shuffle > 0}
-          className={`power-up-button ${shufflesLeft === 0 ? 'opacity-50' : ''}`}
-          title={`Shuffle: Randomizes the board tiles. (${shufflesLeft} left)`}
+          className={`power-up-button group ${shufflesLeft === 0 ? 'opacity-50' : ''}`}
+          aria-label="Shuffle board"
         >
+          <div className="power-up-tooltip">
+            <PowerUpTooltip
+              title="Shuffle Board"
+              description="Randomly rearrange all tiles on the board. Perfect for getting out of tight spots!"
+              uses={shufflesLeft}
+              cooldown={45}
+              unlockScore={1000}
+            />
+          </div>
           <Shuffle className="w-5 h-5" />
           {cooldowns.shuffle > 0 && <span className="cooldown">{cooldowns.shuffle}s</span>}
         </button>
-        
+
         <button
           onClick={() => handlePowerUp('swap')}
           disabled={swapsLeft === 0 || cooldowns.swap > 0}
-          className={`power-up-button ${swapsLeft === 0 ? 'opacity-50' : ''}`}
-          title={`Swap: Allows you to swap two tiles. (${swapsLeft} left)`}
+          className={`power-up-button group ${swapsLeft === 0 ? 'opacity-50' : ''}`}
+          aria-label="Swap tiles"
         >
+          <div className="power-up-tooltip">
+            <PowerUpTooltip
+              title="Swap Tiles"
+              description="Select and swap any two tiles on the board. Use strategically to create matches!"
+              uses={swapsLeft}
+              cooldown={60}
+              unlockScore={1500}
+            />
+          </div>
           <ArrowLeftRight className="w-5 h-5" />
           {cooldowns.swap > 0 && <span className="cooldown">{cooldowns.swap}s</span>}
         </button>
-        
+
         <button
           onClick={() => handlePowerUp('hint')}
           disabled={hintsLeft === 0 || cooldowns.hint > 0}
-          className={`power-up-button ${hintsLeft === 0 ? 'opacity-50' : ''}`}
-          title={`Hint: Shows the best move. (${hintsLeft} left)`}
+          className={`power-up-button group ${hintsLeft === 0 ? 'opacity-50' : ''}`}
+          aria-label="Show hint"
         >
+          <div className="power-up-tooltip">
+            <PowerUpTooltip
+              title="Show Hint"
+              description="Highlight the best possible move. Use when you're stuck!"
+              uses={hintsLeft}
+              cooldown={20}
+              unlockScore={2000}
+            />
+          </div>
           <Lightbulb className="w-5 h-5" />
           {cooldowns.hint > 0 && <span className="cooldown">{cooldowns.hint}s</span>}
         </button>
@@ -186,11 +204,34 @@ const PowerUps: React.FC<PowerUpsProps> = ({
                  hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
         }
         
+        .power-up-tooltip {
+          @apply absolute invisible opacity-0 bottom-full left-1/2 -translate-x-1/2 mb-2 p-2
+                 bg-secondary text-secondary-foreground rounded-lg shadow-lg w-48
+                 transition-all duration-200 ease-in-out z-50
+                 group-hover:visible group-hover:opacity-100;
+        }
+
+        .tooltip-content {
+          @apply flex flex-col gap-1 text-sm;
+        }
+
+        .tooltip-title {
+          @apply font-bold text-base;
+        }
+
+        .tooltip-description {
+          @apply text-xs text-muted-foreground;
+        }
+
+        .tooltip-stats {
+          @apply mt-1 text-xs border-t border-border pt-1 flex flex-col gap-0.5;
+        }
+
         .cooldown {
           @apply absolute -top-2 -right-2 text-xs bg-secondary text-secondary-foreground
                  rounded-full w-6 h-6 flex items-center justify-center;
         }
-        
+
         .timer-container {
           @apply flex items-center gap-2 text-lg font-semibold text-foreground;
         }

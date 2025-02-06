@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
 import { Position } from "../../types";  
 
 interface TileProps {
@@ -68,9 +69,16 @@ export default function Tile({ value, position, merged = false, isDark = false, 
   const colorScheme = getColorScheme(value, isDark);
   const tileKey = `tile-${position.col}-${position.row}-${value}`;
 
+  // Ensure consistent rendering between server and client
+  const [clientValue, setClientValue] = useState<number | null>(null);
+
+  useEffect(() => {
+    setClientValue(value);
+  }, [value]);
+
   return (
     <AnimatePresence>
-      {value !== 0 && (
+      {clientValue !== null && (
         <motion.div
           key={tileKey}
           initial={{ scale: merged ? 0.8 : 0 }}
@@ -101,7 +109,7 @@ export default function Tile({ value, position, merged = false, isDark = false, 
             }}
             className="font-mono tracking-tight"
           >
-            {value}
+            {clientValue}
           </motion.span>
           {hintDirection && <div className={`hint-${hintDirection}`} />}
         </motion.div>
