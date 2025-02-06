@@ -15,7 +15,7 @@ const SWIPE_THRESHOLD = 50;
 const SWIPE_ANGLE_THRESHOLD = 30;
 
 const Game = () => {
-  const { board, score, bestScore, move, isGameOver, resetGame, mergedTiles, setBoard } = useGame();
+  const { board, score, bestScore, move, isGameOver, resetGame, setBoard } = useGame();
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const isProcessingTouch = useRef(false);
   const touchDebounceTime = 100;
@@ -282,7 +282,6 @@ const Game = () => {
         onShuffle={handleShuffle}
         onTileSwap={handleTileSwap}
         onHint={handleHint}
-        onTimedMode={handleTimedMode}
         score={score}
         timer={timer}
         isTimedMode={isTimedMode}

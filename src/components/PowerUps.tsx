@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { RotateCcw, Shuffle, ArrowLeftRight, Lightbulb } from 'lucide-react';
+import { RotateCcw, Shuffle, ArrowLeftRight, Lightbulb, Timer } from 'lucide-react';
 import PowerUpTooltip from './PowerUpTooltip';
 
 interface PowerUpsProps {
@@ -8,7 +8,6 @@ interface PowerUpsProps {
   onShuffle: () => void;
   onTileSwap: () => void;
   onHint: () => void;
-  onTimedMode: () => void;
   score: number;
   timer: number;
   isTimedMode: boolean;
@@ -20,7 +19,6 @@ const PowerUps: React.FC<PowerUpsProps> = ({
   onShuffle,
   onTileSwap,
   onHint,
-  onTimedMode,
   score,
   timer,
   isTimedMode,
