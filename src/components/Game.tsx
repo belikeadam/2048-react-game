@@ -21,7 +21,6 @@ const Game = () => {
   const touchDebounceTime = 100;
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  // Remove unused timer and isTimedMode states since they're not fully implemented
   const [moveHistory, setMoveHistory] = useState<number[][][]>([]);
   const [isSwapMode, setIsSwapMode] = useState(false);
   const [selectedTile, setSelectedTile] = useState<Position | null>(null);
@@ -237,13 +236,6 @@ const Game = () => {
     setTimeout(() => setHintDirection(null), 1000);
   };
 
-  const handleTimedMode = () => {
-    setIsTimedMode(!isTimedMode);
-    if (!isTimedMode) {
-      setTimer(300); // 5 minutes
-    }
-  };
-
   return (
     <div
       id="game-container"
@@ -277,15 +269,15 @@ const Game = () => {
       </div>
       
       <PowerUps
-      onUndo={handleUndo}
-      onShuffle={handleShuffle}
-      onTileSwap={handleTileSwap}
-      onHint={handleHint}
-      score={score}
-      timer={0}
-      isTimedMode={false}
-      moveHistory={moveHistory.length}
-    />
+        onUndo={handleUndo}
+        onShuffle={handleShuffle}
+        onTileSwap={handleTileSwap}
+        onHint={handleHint}
+        score={score}
+        timer={0}
+        isTimedMode={false}
+        moveHistory={moveHistory.length}
+      />
 
       <AnimatePresence>
         {isGameOver && (
