@@ -1,197 +1,200 @@
 'use client'
 
-import { useEffect, useRef, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import Board from "./Board"
-import ScoreBox from "./ScoreBox"
-import PowerUps from "./PowerUps"
-import Footer from "./Footer"
-import { useGame } from "../hooks/useGame"
-import { Moon, Sun } from "lucide-react"
-import type React from "react"
-import { BoardType } from "../../types"
+import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Grid from "./Grid";
+import ScoreBox from "./ScoreBox";
+import PowerUps from "./PowerUps";
+import Footer from "./Footer";
+import { useGame } from "../hooks/useGame";
+import { Moon, Sun } from "lucide-react";
+import type React from "react";
+import { Position, BoardType } from "./types";
 
-const SWIPE_THRESHOLD = 50 // Minimum swipe distance
-const SWIPE_ANGLE_THRESHOLD = 30 // Maximum angle deviation for swipe direction
+const SWIPE_THRESHOLD = 50;
+const SWIPE_ANGLE_THRESHOLD = 30;
 
 const Game = () => {
-  const { board, score, bestScore, move, isGameOver, resetGame, mergedTiles, setBoard } = useGame()
-  const touchStartRef = useRef<{ x: number; y: number } | null>(null)
-  const isProcessingTouch = useRef(false)
-  const touchDebounceTime = 100 // ms
-  const [isDarkMode, setIsDarkMode] = useState(false)
-  const [isMounted, setIsMounted] = useState(false)
-  const [timer, setTimer] = useState(300) // timer value
-  const [isTimedMode, setIsTimedMode] = useState(false)
-  const [moveHistory, setMoveHistory] = useState<number[][][]>([])
-  const [isSwapMode, setIsSwapMode] = useState(false)
-  const [selectedTile, setSelectedTile] = useState<{ x: number, y: number } | null>(null)
-  const [hintDirection, setHintDirection] = useState<string | null>(null)
+  const { board, score, bestScore, move, isGameOver, resetGame, mergedTiles, setBoard } = useGame();
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const isProcessingTouch = useRef(false);
+  const touchDebounceTime = 100;
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const [timer, setTimer] = useState(300);
+  const [isTimedMode, setIsTimedMode] = useState(false);
+  const [moveHistory, setMoveHistory] = useState<number[][][]>([]);
+  const [isSwapMode, setIsSwapMode] = useState(false);
+  const [selectedTile, setSelectedTile] = useState<Position | null>(null);
+  const [hintDirection, setHintDirection] = useState<string | null>(null);
 
   useEffect(() => {
-    setIsMounted(true)
-    const savedTheme = localStorage.getItem('darkMode')
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    setIsDarkMode(savedTheme ? JSON.parse(savedTheme) : systemPrefersDark)
-  }, [])
+    setIsMounted(true);
+    const savedTheme = localStorage.getItem('darkMode');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setIsDarkMode(savedTheme ? JSON.parse(savedTheme) : systemPrefersDark);
+  }, []);
 
   useEffect(() => {
     if (isMounted) {
-      localStorage.setItem('darkMode', JSON.stringify(isDarkMode))
+      localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
       if (isDarkMode) {
-        document.documentElement.classList.add('dark')
+        document.documentElement.classList.add('dark');
       } else {
-        document.documentElement.classList.remove('dark')
+        document.documentElement.classList.remove('dark');
       }
     }
-  }, [isDarkMode, isMounted])
+  }, [isDarkMode, isMounted]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
-        e.preventDefault()
-        move(e.key.replace("Arrow", "").toLowerCase() as "up" | "down" | "left" | "right")
+        e.preventDefault();
+        move(e.key.replace("Arrow", "").toLowerCase() as "up" | "down" | "left" | "right");
       }
-    }
+    };
 
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [move])
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [move]);
 
   useEffect(() => {
-    const gameContainer = document.getElementById('game-container')
+    const gameContainer = document.getElementById('game-container');
     
     const handleTouchStart = (e: TouchEvent) => {
       touchStartRef.current = {
         x: e.touches[0].clientX,
         y: e.touches[0].clientY,
-      }
-    }
+      };
+    };
 
     const handleTouchMove = (e: TouchEvent) => {
-      e.preventDefault()
-    }
+      e.preventDefault();
+    };
 
     const handleTouchEnd = (e: TouchEvent) => {
-      if (!touchStartRef.current || isProcessingTouch.current) return
+      if (!touchStartRef.current || isProcessingTouch.current) return;
       
-      isProcessingTouch.current = true
+      isProcessingTouch.current = true;
       
       const touchEnd = {
         x: e.changedTouches[0].clientX,
         y: e.changedTouches[0].clientY,
-      }
+      };
 
-      const dx = touchEnd.x - touchStartRef.current.x
-      const dy = touchEnd.y - touchStartRef.current.y
-      const angle = Math.abs((Math.atan2(dy, dx) * 180) / Math.PI)
+      const dx = touchEnd.x - touchStartRef.current.x;
+      const dy = touchEnd.y - touchStartRef.current.y;
+      const angle = Math.abs((Math.atan2(dy, dx) * 180) / Math.PI);
 
       if (Math.abs(dx) > SWIPE_THRESHOLD || Math.abs(dy) > SWIPE_THRESHOLD) {
         if (angle < SWIPE_ANGLE_THRESHOLD || angle > 180 - SWIPE_ANGLE_THRESHOLD) {
-          move(dx > 0 ? "right" : "left")
+          move(dx > 0 ? "right" : "left");
         } else if (Math.abs(angle - 90) < SWIPE_ANGLE_THRESHOLD) {
-          move(dy > 0 ? "down" : "up")
+          move(dy > 0 ? "down" : "up");
         }
       }
 
-      touchStartRef.current = null
+      touchStartRef.current = null;
       
       setTimeout(() => {
-        isProcessingTouch.current = false
-      }, touchDebounceTime)
-    }
+        isProcessingTouch.current = false;
+      }, touchDebounceTime);
+    };
 
     if (gameContainer) {
-      gameContainer.addEventListener('touchstart', handleTouchStart, { passive: true })
-      gameContainer.addEventListener('touchmove', handleTouchMove, { passive: false })
-      gameContainer.addEventListener('touchend', handleTouchEnd, { passive: true })
+      gameContainer.addEventListener('touchstart', handleTouchStart, { passive: true });
+      gameContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
+      gameContainer.addEventListener('touchend', handleTouchEnd, { passive: true });
       
-      document.body.style.overflow = 'hidden'
+      document.body.style.overflow = 'hidden';
     }
     
     return () => {
       if (gameContainer) {
-        gameContainer.removeEventListener('touchstart', handleTouchStart)
-        gameContainer.removeEventListener('touchmove', handleTouchMove)
-        gameContainer.removeEventListener('touchend', handleTouchEnd)
-        document.body.style.overflow = 'auto'
+        gameContainer.removeEventListener('touchstart', handleTouchStart);
+        gameContainer.removeEventListener('touchmove', handleTouchMove);
+        gameContainer.removeEventListener('touchend', handleTouchEnd);
+        document.body.style.overflow = 'auto';
       }
-    }
-  }, [move])
-
-  // React touch event handlers (for the div element)
-  const onTouchStart = (e: React.TouchEvent) => {
-    e.preventDefault()
-  }
-
-  const onTouchMove = (e: React.TouchEvent) => {
-    e.preventDefault()
-  }
-
-  const onTouchEnd = (e: React.TouchEvent) => {
-    e.preventDefault()
-  }
+    };
+  }, [move]);
 
   useEffect(() => {
     if (board) {
-      setMoveHistory(prev => [...prev, board])
+      setMoveHistory(prev => [...prev, board]);
     }
-  }, [board])
+  }, [board]);
 
   const handleUndo = () => {
     if (moveHistory.length > 1) {
-      const previousBoard = moveHistory[moveHistory.length - 2]
-      setBoard(previousBoard)
-      setMoveHistory(prev => prev.slice(0, -1))
+      const previousBoard = moveHistory[moveHistory.length - 2];
+      setBoard(previousBoard);
+      setMoveHistory(prev => prev.slice(0, -1));
     }
-  }
+  };
 
   const handleShuffle = () => {
-    const flatBoard = board.flat().filter(value => value !== 0)
-    const shuffled = [...flatBoard].sort(() => Math.random() - 0.5)
-    let index = 0
+    const flatBoard = board.flat().filter(value => value !== 0);
+    const shuffled = [...flatBoard].sort(() => Math.random() - 0.5);
+    let index = 0;
     const newBoard = board.map(row =>
       row.map(cell => (cell !== 0 ? shuffled[index++] : 0))
-    )
-    setBoard(newBoard)
-  }
+    );
+    setBoard(newBoard);
+  };
 
   const handleTileSwap = () => {
-    setIsSwapMode(true)
-  }
+    setIsSwapMode(true);
+  };
+
+  const handleTileClick = (row: number, col: number) => {
+    if (!isSwapMode) return;
+
+    if (!selectedTile) {
+      setSelectedTile({ row, col });
+    } else {
+      const newBoard = [...board];
+      const { row: row1, col: col1 } = selectedTile;
+      [newBoard[row][col], newBoard[row1][col1]] = [newBoard[row1][col1], newBoard[row][col]];
+      
+      setBoard(newBoard);
+      setIsSwapMode(false);
+      setSelectedTile(null);
+    }
+  };
 
   const calculateBestMove = (board: BoardType): string => {
-    const directions = ['up', 'right', 'down', 'left']
-    let bestScore = -1
-    let bestMove = 'up'
+    const directions = ['up', 'right', 'down', 'left'];
+    let bestScore = -1;
+    let bestMove = 'up';
 
     directions.forEach(direction => {
-      const { score } = simulateMove(board, direction)
+      const { score } = simulateMove(board, direction);
       if (score > bestScore) {
-        bestScore = score
-        bestMove = direction
+        bestScore = score;
+        bestMove = direction;
       }
-    })
+    });
 
-    return bestMove
-  }
+    return bestMove;
+  };
 
   const simulateMove = (board: BoardType, direction: string) => {
-    const newBoard = board.map(row => [...row])
-    let score = 0
+    const newBoard = board.map(row => [...row]);
+    let score = 0;
 
     const moveAndMerge = (i: number, j: number, di: number, dj: number) => {
-      if (!newBoard[i][j]) return
-      let newI = i + di
-      let newJ = j + dj
+      if (!newBoard[i][j]) return;
+      let newI = i + di;
+      let newJ = j + dj;
       
       while (
         newI >= 0 && newI < 4 && 
         newJ >= 0 && newJ < 4 && 
         !newBoard[newI][newJ]
       ) {
-        newI += di
-        newJ += dj
+        newI += di;
+        newJ += dj;
       }
       
       if (
@@ -199,57 +202,54 @@ const Game = () => {
         newJ >= 0 && newJ < 4 && 
         newBoard[newI][newJ] === newBoard[i][j]
       ) {
-        score++
+        score++;
       }
-    }
+    };
 
     switch (direction) {
       case 'up':
         for (let i = 1; i < 4; i++) 
           for (let j = 0; j < 4; j++) 
-            moveAndMerge(i, j, -1, 0)
-        break
+            moveAndMerge(i, j, -1, 0);
+        break;
       case 'down':
         for (let i = 2; i >= 0; i--) 
           for (let j = 0; j < 4; j++) 
-            moveAndMerge(i, j, 1, 0)
-        break
+            moveAndMerge(i, j, 1, 0);
+        break;
       case 'left':
         for (let i = 0; i < 4; i++) 
           for (let j = 1; j < 4; j++) 
-            moveAndMerge(i, j, 0, -1)
-        break
+            moveAndMerge(i, j, 0, -1);
+        break;
       case 'right':
         for (let i = 0; i < 4; i++) 
           for (let j = 2; j >= 0; j--) 
-            moveAndMerge(i, j, 0, 1)
-        break
+            moveAndMerge(i, j, 0, 1);
+        break;
     }
 
-    return { board: newBoard, score }
-  }
+    return { board: newBoard, score };
+  };
 
   const handleHint = () => {
-    const bestMove = calculateBestMove(board)
-    setHintDirection(bestMove)
-    setTimeout(() => setHintDirection(null), 1000)
-  }
+    const bestMove = calculateBestMove(board);
+    setHintDirection(bestMove);
+    setTimeout(() => setHintDirection(null), 1000);
+  };
 
   const handleTimedMode = () => {
-    setIsTimedMode(!isTimedMode)
+    setIsTimedMode(!isTimedMode);
     if (!isTimedMode) {
-      setTimer(300) // 5 minutes
+      setTimer(300); // 5 minutes
     }
-  }
+  };
 
   return (
     <div
       id="game-container"
       className={`game-container flex flex-col items-center justify-center min-h-screen transition-colors duration-300 
         ${isDarkMode ? 'dark bg-background' : 'bg-gradient-to-br from-blue-50 to-indigo-100'}`}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
     >
       <div className="flex items-center justify-between w-full max-w-md mb-8 px-4">
         <h1 className="text-4xl font-bold text-foreground tracking-tight">
@@ -268,7 +268,13 @@ const Game = () => {
           <ScoreBox label="SCORE" value={score} isDark={isDarkMode} />
           <ScoreBox label="BEST" value={bestScore} isDark={isDarkMode} />
         </div>
-        <Board board={board} mergedTiles={mergedTiles} isDark={isDarkMode} />
+        <Grid 
+          grid={board}
+          onTileClick={handleTileClick}
+          swapMode={isSwapMode}
+          selectedTile={selectedTile}
+          hintDirection={hintDirection}
+        />
       </div>
       
       <PowerUps
@@ -312,7 +318,7 @@ const Game = () => {
 
       <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default Game
+export default Game;

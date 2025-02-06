@@ -87,3 +87,51 @@ body {
   -ms-perspective: 1000;
   perspective: 1000;
 }
+.tile {
+  @apply relative transition-all duration-200;
+}
+
+.tile.swap-mode {
+  @apply cursor-pointer hover:brightness-110;
+}
+
+.tile.selected {
+  @apply ring-4 ring-blue-500;
+}
+
+@layer components {
+  .hint-up { @apply animate-bounce-up; }
+  .hint-down { @apply animate-bounce-down; }
+  .hint-left { @apply animate-bounce-left; }
+  .hint-right { @apply animate-bounce-right; }
+
+  @keyframes bounce-up { 
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes bounce-down { 
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(10px); }
+  }
+  @keyframes bounce-left { 
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(-10px); }
+  }
+  @keyframes bounce-right { 
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(10px); }
+  }
+
+  .animate-bounce-up {
+    animation: bounce-up 1s infinite;
+  }
+  .animate-bounce-down {
+    animation: bounce-down 1s infinite;
+  }
+  .animate-bounce-left {
+    animation: bounce-left 1s infinite;
+  }
+  .animate-bounce-right {
+    animation: bounce-right 1s infinite;
+  }
+}
