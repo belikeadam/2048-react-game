@@ -25,17 +25,18 @@ export default function Board({ board, mergedTiles, isDark }: BoardProps) {
       </div>
       {/* Tiles */}
       {board.flat().map((value: CellValue, index) => {
-        const x = index % 4;
-        const y = Math.floor(index / 4);
-        const key = `${x}-${y}`;
+        const row = Math.floor(index / 4);
+        const col = index % 4;
+        const key = `${row}-${col}`;
         return (
           <Tile 
-            key={key} 
-            value={value ?? 0} 
-            position={{ x, y }} 
-            merged={mergedTiles[key] || false} 
-            isDark={isDark}
-          />
+            key={key}
+            value={value ?? 0}
+            position={{ row, col }}
+            merged={mergedTiles[key] || false}
+            isDark={isDark} onClick={function (): void {
+              throw new Error("Function not implemented.");
+            } } swapMode={false} selected={false} hintDirection={null}          />
         );
       })}
     </div>
