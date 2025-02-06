@@ -1,4 +1,4 @@
-@tailwind base;
+ @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -70,20 +70,214 @@ body {
     @apply bg-background text-foreground;
   }
 }
+.power-up-button {
+  @apply relative flex items-center justify-center p-3 rounded-lg bg-primary 
+         text-primary-foreground hover:bg-primary/90 transition-colors 
+         disabled:opacity-50 disabled:cursor-not-allowed;
+}
 
+.power-up-tooltip {
+  @apply absolute invisible opacity-0 bottom-full left-1/2 -translate-x-1/2 mb-2 p-2
+         bg-secondary text-secondary-foreground rounded-lg shadow-lg w-48
+         transition-all duration-200 ease-in-out z-50
+         group-hover:visible group-hover:opacity-100;
+}
+
+.tooltip-content {
+  @apply flex flex-col gap-1 text-sm;
+}
+
+.tooltip-title {
+  @apply font-bold text-base;
+}
+
+.tooltip-description {
+  @apply text-xs text-muted-foreground;
+}
+
+.tooltip-stats {
+  @apply mt-1 text-xs border-t border-border pt-1 flex flex-col gap-0.5;
+}
+
+.cooldown {
+  @apply absolute -top-2 -right-2 text-xs bg-secondary text-secondary-foreground
+         rounded-full w-6 h-6 flex items-center justify-center;
+}
 /* Add hardware acceleration for smoother animations */
 .game-container {
-  -webkit-transform: translateZ(0);
-  -moz-transform: translateZ(0);
-  -ms-transform: translateZ(0);
-  -o-transform: translateZ(0);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #faf8ef;
+  padding: 20px;
+  
+  /* Hardware acceleration */
   transform: translateZ(0);
-  -webkit-backface-visibility: hidden;
-  -moz-backface-visibility: hidden;
-  -ms-backface-visibility: hidden;
   backface-visibility: hidden;
-  -webkit-perspective: 1000;
-  -moz-perspective: 1000;
-  -ms-perspective: 1000;
   perspective: 1000;
+  
+  /* Additional acceleration properties */
+  -webkit-transform: translate3d(0,0,0);
+  -moz-transform: translate3d(0,0,0);
+  -ms-transform: translate3d(0,0,0);
+  transform: translate3d(0,0,0);
+  
+  /* Smooth animations */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  /* Prevent unwanted touch behaviors */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  
+  /* Optimize performance */
+  will-change: transform;
+  contain: content;
+}
+
+.score-container {
+  display: flex;
+  justify-content: space-between;
+  width: 320px;
+  margin-bottom: 20px;
+}
+
+.score-box {
+  background-color: #bbada0;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  width: 100px;
+}
+
+.power-ups-container {
+  display: flex;
+  justify-content: space-between;
+  width: 320px;
+  margin-top: 20px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  width: 320px;
+  height: 320px;
+  background-color: #bbada0;
+  padding: 12px;
+  border-radius: 10px;
+  position: relative;
+}
+
+.grid-bg {
+  position: absolute;
+  inset: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  z-index: 0;
+}
+
+.grid-cell {
+  background-color: rgba(238, 228, 218, 0.35);
+  border-radius: 6px;
+  width: 65px;
+  height: 65px;
+}
+
+.tile {
+  width: 65px;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: 6px;
+  position: absolute;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  z-index: 1;
+  
+  /* Hardware acceleration for tiles */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
+  
+  /* Smooth animations */
+  transition: transform 100ms ease-in-out;
+}
+
+/* Optimize animations */
+@media (prefers-reduced-motion: reduce) {
+  .tile {
+    transition: none;
+  }
+}
+
+.tile.swap-mode {
+  cursor: pointer;
+  hover: brightness(110%);
+}
+
+.tile.selected {
+  ring: 4px solid blue;
+}
+
+.hint-up {
+  animation: bounce-up 1s infinite;
+}
+
+.hint-down {
+  animation: bounce-down 1s infinite;
+}
+
+.hint-left {
+  animation: bounce-left 1s infinite;
+}
+
+.hint-right {
+  animation: bounce-right 1s infinite;
+}
+
+@keyframes bounce-up {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes bounce-down {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(10px); }
+}
+
+@keyframes bounce-left {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-10px); }
+}
+
+@keyframes bounce-right {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(10px); }
+}
+
+@layer components {
+  .hint-up { @apply animate-bounce-up; }
+  .hint-down { @apply animate-bounce-down; }
+  .hint-left { @apply animate-bounce-left; }
+  .hint-right { @apply animate-bounce-right; }
+
+  .animate-bounce-up {
+    animation: bounce-up 1s infinite;
+  }
+  .animate-bounce-down {
+    animation: bounce-down 1s infinite;
+  }
+  .animate-bounce-left {
+    animation: bounce-left 1s infinite;
+  }
+  .animate-bounce-right {
+    animation: bounce-right 1s infinite;
+  }
 }

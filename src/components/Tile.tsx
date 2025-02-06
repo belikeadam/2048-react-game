@@ -1,10 +1,16 @@
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
+import { Position } from "../../types";  
 
 interface TileProps {
   value: number;
-  position: { x: number; y: number };
-  merged: boolean;
+  position: Position;
+  merged?: boolean;
   isDark?: boolean;
+  onClick: () => void;
+  swapMode: boolean;
+  selected: boolean;
+  hintDirection: string | null;
 }
 
 const getColorScheme = (value: number, isDark: boolean = false) => {
@@ -58,20 +64,28 @@ const getColorScheme = (value: number, isDark: boolean = false) => {
   return colors[value]?.[isDark ? 'dark' : 'light'] || 
     (isDark ? 'bg-gray-600 text-gray-200' : 'bg-gray-200 text-gray-800');
 }
-export default function Tile({ value, position, merged, isDark }: TileProps) {
+
+export default function Tile({ value, position, merged = false, isDark = false, onClick, swapMode, selected, hintDirection }: TileProps) {
   const colorScheme = getColorScheme(value, isDark);
-  const tileKey = `tile-${position.x}-${position.y}-${value}`;
+  const tileKey = `tile-${position.col}-${position.row}-${value}`;
+
+  // Ensure consistent rendering between server and client
+  const [clientValue, setClientValue] = useState<number | null>(null);
+
+  useEffect(() => {
+    setClientValue(value);
+  }, [value]);
 
   return (
     <AnimatePresence>
-      {value !== 0 && (
+      {clientValue !== null && (
         <motion.div
           key={tileKey}
           initial={{ scale: merged ? 0.8 : 0 }}
           animate={{
             scale: 1,
-            x: position.x * 78,
-            y: position.y * 78,
+            x: position.col * 77, // (65px tile + 12px gap)
+            y: position.row * 77, // (65px tile + 12px gap)
           }}
           exit={{ scale: 0 }}
           transition={{
@@ -81,8 +95,9 @@ export default function Tile({ value, position, merged, isDark }: TileProps) {
             duration: 0.15,
             mass: 0.5
           }}
-          className={`absolute w-[76px] h-[76px] flex items-center justify-center rounded-lg ${colorScheme} 
-            text-2xl font-bold shadow-lg backdrop-blur-sm`}
+          className={`absolute w-[65px] h-[65px] flex items-center justify-center rounded-lg ${colorScheme} 
+            text-2xl font-bold shadow-lg backdrop-blur-sm ${swapMode ? 'swap-mode' : ''} ${selected ? 'selected' : ''}`}
+          onClick={onClick}
         >
           <motion.span
             initial={{ scale: 0.8 }}
@@ -94,8 +109,9 @@ export default function Tile({ value, position, merged, isDark }: TileProps) {
             }}
             className="font-mono tracking-tight"
           >
-            {value}
+            {clientValue}
           </motion.span>
+          {hintDirection && <div className={`hint-${hintDirection}`} />}
         </motion.div>
       )}
     </AnimatePresence>
